@@ -3,68 +3,512 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GIROK labs</title>
+  <title>증여세 계산기</title>
   <style>
-    body {
-      font-family: 'Segoe UI', 'Apple SD Gothic Neo', Arial, sans-serif;
-      background: #f7fafc;
+    * {
       margin: 0;
       padding: 0;
-      color: #222;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
     .container {
-      max-width: 600px;
-      margin: 60px auto;
+      max-width: 800px;
+      margin: 0 auto;
       background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-      padding: 40px 30px 30px 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      padding: 30px;
       text-align: center;
     }
-    h1 {
-      color: #2563eb;
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 600;
       margin-bottom: 10px;
     }
-    h2 {
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
       color: #333;
+      font-size: 1rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background-color: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #4facfe;
+      box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+    }
+
+    .calculate-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 30px 0;
+    }
+
+    .calculate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .calculate-btn:active {
+      transform: translateY(0);
+    }
+
+    .result {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
       margin-top: 30px;
-      margin-bottom: 10px;
+      display: none;
     }
-    p {
-      color: #444;
-      line-height: 1.7;
+
+    .result.show {
+      display: block;
+      animation: slideIn 0.5s ease-out;
     }
-    .contact {
-      margin-top: 30px;
-      font-size: 1.05em;
-      color: #2563eb;
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    .logo {
-      width: 70px;
+
+    .result h3 {
+      font-size: 1.5rem;
       margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .result-item:last-child {
+      border-bottom: none;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-top: 10px;
+      padding-top: 20px;
+      border-top: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .result-label {
+      font-weight: 500;
+    }
+
+    .result-value {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .info-section {
+      background: #f8fafc;
+      padding: 25px;
+      border-radius: 12px;
+      margin-top: 30px;
+      border-left: 4px solid #4facfe;
+    }
+
+    .info-section h4 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+
+    .info-section ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .info-section li {
+      padding: 8px 0;
+      color: #666;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .info-section li:before {
+      content: "•";
+      color: #4facfe;
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+
+    .tax-table {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .tax-table th,
+    .tax-table td {
+      padding: 12px 15px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    .tax-table th {
+      background: #4facfe;
+      color: white;
+      font-weight: 600;
+    }
+
+    .tax-table tr:hover {
+      background: #f8fafc;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .content {
+        padding: 20px;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .tax-table {
+        font-size: 0.9rem;
+      }
+      
+      .tax-table th,
+      .tax-table td {
+        padding: 8px 10px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="https://avatars.githubusercontent.com/u/17185790?s=200&v=4" alt="GIROK labs logo" class="logo" />
-    <h1>GIROK labs</h1>
-    <p>기록을 통해 더 나은 삶을 만드는 GIROK labs에 오신 것을 환영합니다.<br>
-    저희는 건강, 습관, 자기계발 등 다양한 분야의 기록 서비스를 개발합니다.</p>
+    <div class="header">
+      <h1>증여세 계산기</h1>
+      <p>2024년 기준 한국 증여세 법령에 따른 정확한 계산</p>
+    </div>
 
-    <h2>주요 서비스</h2>
-    <p>
-      • 콜레스테롤 트래커 앱<br>
-      • 건강 관리 및 알림 서비스<br>
-      • 개인화된 데이터 시각화<br>
-      • 기록 기반 자기계발 도구
-    </p>
+    <div class="content">
+      <form id="giftTaxForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="giftAmount">증여재산 가액 (원)</label>
+            <input type="number" id="giftAmount" placeholder="예: 100000000" required>
+          </div>
+          <div class="form-group">
+            <label for="relationship">증여자와의 관계</label>
+            <select id="relationship" required>
+              <option value="">관계 선택</option>
+              <option value="spouse">배우자</option>
+              <option value="lineal">직계존비속 (부모, 자녀, 조부모, 손자녀)</option>
+              <option value="sibling">형제자매</option>
+              <option value="other">기타 친족</option>
+              <option value="stranger">타인</option>
+            </select>
+          </div>
+        </div>
 
-    <h2>연락처</h2>
-    <p class="contact">
-      이메일: <a href="mailto:greego86@gmail.com">greego86@gmail.com</a><br>
-      GitHub: <a href="https://github.com/giroklabs" target="_blank">github.com/giroklabs</a>
-    </p>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="recipientAge">수증자 연령</label>
+            <select id="recipientAge" required>
+              <option value="">연령 선택</option>
+              <option value="minor">미성년자 (19세 미만)</option>
+              <option value="adult">성인 (19세 이상)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="priorGifts">기존 증여액 (최근 10년 내, 원)</label>
+            <input type="number" id="priorGifts" placeholder="예: 50000000" value="0">
+          </div>
+        </div>
+
+        <button type="submit" class="calculate-btn">증여세 계산하기</button>
+      </form>
+
+      <div id="result" class="result">
+        <h3>계산 결과</h3>
+        <div class="result-item">
+          <span class="result-label">증여재산 가액:</span>
+          <span class="result-value" id="totalGiftAmount">-</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">증여공제액:</span>
+          <span class="result-value" id="deductionAmount">-</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">과세표준:</span>
+          <span class="result-value" id="taxableAmount">-</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">산출세액:</span>
+          <span class="result-value" id="calculatedTax">-</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">세액공제:</span>
+          <span class="result-value" id="taxCredit">-</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">최종 납부할 증여세:</span>
+          <span class="result-value" id="finalTax">-</span>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h4>📋 증여공제 한도액 (10년 누계)</h4>
+        <ul>
+          <li><strong>배우자:</strong> 6억원</li>
+          <li><strong>직계존비속:</strong> 성인 5천만원, 미성년자 2천만원</li>
+          <li><strong>형제자매:</strong> 1천만원</li>
+          <li><strong>기타 친족:</strong> 500만원</li>
+          <li><strong>타인:</strong> 공제 없음</li>
+        </ul>
+
+        <h4 style="margin-top: 25px;">📊 증여세율표</h4>
+        <table class="tax-table">
+          <thead>
+            <tr>
+              <th>과세표준</th>
+              <th>세율</th>
+              <th>누진공제액</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1억원 이하</td>
+              <td>10%</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td>1억원 초과 ~ 5억원 이하</td>
+              <td>20%</td>
+              <td>1천만원</td>
+            </tr>
+            <tr>
+              <td>5억원 초과 ~ 10억원 이하</td>
+              <td>30%</td>
+              <td>6천만원</td>
+            </tr>
+            <tr>
+              <td>10억원 초과 ~ 30억원 이하</td>
+              <td>40%</td>
+              <td>1억 6천만원</td>
+            </tr>
+            <tr>
+              <td>30억원 초과</td>
+              <td>50%</td>
+              <td>4억 6천만원</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4 style="margin-top: 25px;">⚠️ 주의사항</h4>
+        <ul>
+          <li>본 계산기는 2024년 기준 세법을 적용한 참고용입니다.</li>
+          <li>실제 신고 시에는 세무전문가와 상담하시기 바랍니다.</li>
+          <li>증여세 신고는 증여일이 속하는 달의 말일부터 3개월 이내에 해야 합니다.</li>
+        </ul>
+      </div>
+    </div>
   </div>
+
+  <script>
+    // 증여공제 한도액 (10년 누계)
+    const deductionLimits = {
+      spouse: 600000000,        // 배우자: 6억원
+      lineal_adult: 50000000,   // 직계존비속 성인: 5천만원
+      lineal_minor: 20000000,   // 직계존비속 미성년자: 2천만원
+      sibling: 10000000,        // 형제자매: 1천만원
+      other: 5000000,           // 기타 친족: 500만원
+      stranger: 0               // 타인: 공제 없음
+    };
+
+    // 증여세율표
+    const taxRates = [
+      { limit: 100000000, rate: 0.10, deduction: 0 },         // 1억원 이하: 10%
+      { limit: 500000000, rate: 0.20, deduction: 10000000 },  // 5억원 이하: 20% (누진공제 1천만원)
+      { limit: 1000000000, rate: 0.30, deduction: 60000000 }, // 10억원 이하: 30% (누진공제 6천만원)
+      { limit: 3000000000, rate: 0.40, deduction: 160000000 }, // 30억원 이하: 40% (누진공제 1억6천만원)
+      { limit: Infinity, rate: 0.50, deduction: 460000000 }   // 30억원 초과: 50% (누진공제 4억6천만원)
+    ];
+
+    function formatNumber(num) {
+      return new Intl.NumberFormat('ko-KR').format(Math.round(num)) + '원';
+    }
+
+    function getDeductionLimit(relationship, age) {
+      if (relationship === 'spouse') return deductionLimits.spouse;
+      if (relationship === 'lineal') {
+        return age === 'adult' ? deductionLimits.lineal_adult : deductionLimits.lineal_minor;
+      }
+      if (relationship === 'sibling') return deductionLimits.sibling;
+      if (relationship === 'other') return deductionLimits.other;
+      if (relationship === 'stranger') return deductionLimits.stranger;
+      return 0;
+    }
+
+    function calculateTax(taxableAmount) {
+      if (taxableAmount <= 0) return 0;
+
+      for (const bracket of taxRates) {
+        if (taxableAmount <= bracket.limit) {
+          return Math.max(0, taxableAmount * bracket.rate - bracket.deduction);
+        }
+      }
+      return 0;
+    }
+
+    function calculateGiftTax() {
+      const giftAmount = parseInt(document.getElementById('giftAmount').value) || 0;
+      const relationship = document.getElementById('relationship').value;
+      const recipientAge = document.getElementById('recipientAge').value;
+      const priorGifts = parseInt(document.getElementById('priorGifts').value) || 0;
+
+      if (!giftAmount || !relationship || !recipientAge) {
+        alert('모든 필수 항목을 입력해주세요.');
+        return;
+      }
+
+      // 1. 총 증여액 (기존 증여액 + 현재 증여액)
+      const totalGiftAmount = priorGifts + giftAmount;
+
+      // 2. 증여공제 한도액
+      const deductionLimit = getDeductionLimit(relationship, recipientAge);
+
+      // 3. 실제 공제액 (공제한도와 총증여액 중 작은 금액)
+      const actualDeduction = Math.min(deductionLimit, totalGiftAmount);
+
+      // 4. 과세표준 (총증여액 - 공제액)
+      const taxableAmount = Math.max(0, totalGiftAmount - actualDeduction);
+
+      // 5. 산출세액
+      const calculatedTax = calculateTax(taxableAmount);
+
+      // 6. 기존 증여에 대한 세액 (차감할 세액)
+      const priorTaxableAmount = Math.max(0, priorGifts - actualDeduction);
+      const priorTax = priorTaxableAmount > 0 ? calculateTax(Math.max(0, priorGifts - Math.min(deductionLimit, priorGifts))) : 0;
+
+      // 7. 세액공제 (기본공제 250만원, 과세표준이 있는 경우에만)
+      const taxCredit = taxableAmount > 0 ? Math.min(2500000, calculatedTax) : 0;
+
+      // 8. 최종 납부세액
+      const finalTax = Math.max(0, calculatedTax - priorTax - taxCredit);
+
+      // 결과 표시
+      document.getElementById('totalGiftAmount').textContent = formatNumber(totalGiftAmount);
+      document.getElementById('deductionAmount').textContent = formatNumber(actualDeduction);
+      document.getElementById('taxableAmount').textContent = formatNumber(taxableAmount);
+      document.getElementById('calculatedTax').textContent = formatNumber(calculatedTax);
+      document.getElementById('taxCredit').textContent = formatNumber(taxCredit);
+      document.getElementById('finalTax').textContent = formatNumber(finalTax);
+
+      document.getElementById('result').classList.add('show');
+      document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById('giftTaxForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      calculateGiftTax();
+    });
+
+    // 입력값 변경 시 자동 계산
+    document.getElementById('giftAmount').addEventListener('input', function() {
+      if (this.value && document.getElementById('relationship').value && document.getElementById('recipientAge').value) {
+        calculateGiftTax();
+      }
+    });
+
+    document.getElementById('relationship').addEventListener('change', function() {
+      if (document.getElementById('giftAmount').value && this.value && document.getElementById('recipientAge').value) {
+        calculateGiftTax();
+      }
+    });
+
+    document.getElementById('recipientAge').addEventListener('change', function() {
+      if (document.getElementById('giftAmount').value && document.getElementById('relationship').value && this.value) {
+        calculateGiftTax();
+      }
+    });
+
+    document.getElementById('priorGifts').addEventListener('input', function() {
+      if (document.getElementById('giftAmount').value && document.getElementById('relationship').value && document.getElementById('recipientAge').value) {
+        calculateGiftTax();
+      }
+    });
+  </script>
 </body>
-</html> 
+</html>
