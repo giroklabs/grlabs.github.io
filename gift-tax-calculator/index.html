@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>증여세 계산기</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>증여세 계산기</h1>
+      <form id="gift-tax-form" novalidate>
+        <div class="field">
+          <label for="giftAmount">증여재산가액 (원)</label>
+          <input id="giftAmount" name="giftAmount" type="text" inputmode="numeric" placeholder="예: 300,000,000" autocomplete="off" />
+          <small class="hint">콤마는 입력해도 됩니다.</small>
+        </div>
+
+        <div class="field">
+          <label for="relationship">증여자와의 관계</label>
+          <select id="relationship" name="relationship">
+            <option value="spouse">배우자 (공제 600,000,000원)</option>
+            <option value="lineal_descendant_adult">직계비속(성인) (공제 50,000,000원)</option>
+            <option value="lineal_descendant_minor">직계비속(미성년) (공제 20,000,000원)</option>
+            <option value="lineal_ascendant_adult">직계존속(성인 수증자) (공제 50,000,000원)</option>
+            <option value="lineal_ascendant_minor">직계존속(미성년 수증자) (공제 20,000,000원)</option>
+            <option value="other_relatives">기타 친족 (공제 10,000,000원)</option>
+            <option value="others">기타인(친족 아님) (공제 0원)</option>
+          </select>
+        </div>
+
+        <div class="field inline">
+          <label class="checkbox">
+            <input id="applyReportingCredit" type="checkbox" checked />
+            자진신고세액공제 3% 적용
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="submit">계산하기</button>
+          <button type="button" id="resetBtn" class="secondary">초기화</button>
+        </div>
+      </form>
+
+      <section id="results" class="results hidden" aria-live="polite" aria-atomic="true">
+        <h2>계산 결과</h2>
+        <div class="grid">
+          <div class="row"><span>증여재산가액</span><strong id="r_giftAmount">-</strong></div>
+          <div class="row"><span>기본공제</span><strong id="r_deduction">-</strong></div>
+          <div class="row"><span>과세표준</span><strong id="r_taxBase">-</strong></div>
+          <div class="row"><span>세율</span><strong id="r_rate">-</strong></div>
+          <div class="row"><span>누진공제액</span><strong id="r_quickDeduction">-</strong></div>
+          <div class="row"><span>산출세액</span><strong id="r_computedTax">-</strong></div>
+          <div class="row"><span>자진신고세액공제</span><strong id="r_reportingCredit">-</strong></div>
+          <div class="row total"><span>예상 납부세액</span><strong id="r_totalTax">-</strong></div>
+        </div>
+        <p class="note">본 계산기는 참고용으로, 최신 세법 및 개인별 특수사항(혼인/출산 추가공제 등)에 따라 실제 세액은 달라질 수 있습니다.</p>
+      </section>
+
+      <section class="notes">
+        <details>
+          <summary>계산 로직과 세율표 보기</summary>
+          <ul>
+            <li>세율표(과세표준 기준): 1억 이하 10%, 1억~5억 20%(누진공제 10,000,000), 5억~10억 30%(누진공제 60,000,000), 10억~30억 40%(누진공제 160,000,000), 30억 초과 50%(누진공제 460,000,000)</li>
+            <li>기본공제: 배우자 600,000,000 / 직계비속(성인) 50,000,000 / 직계비속(미성년) 20,000,000 / 직계존속(성인 수증자) 50,000,000 / 직계존속(미성년 수증자) 20,000,000 / 기타 친족 10,000,000 / 기타인 0</li>
+            <li>자진신고세액공제 3%는 선택 적용</li>
+          </ul>
+        </details>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+  </html>
+
