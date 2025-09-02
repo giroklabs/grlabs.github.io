@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIRE 계산기 - GIROK labs</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .calculator-card {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .calculator-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    .card-title {
+      font-size: 1.4em;
+      color: #2563eb;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-group input:focus, .input-group select:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .calculate-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .calculate-btn:hover {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      transform: translateY(-1px);
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f0f9ff;
+      border-radius: 8px;
+      border-left: 4px solid #2563eb;
+    }
+
+    .result h3 {
+      color: #1e40af;
+      margin-bottom: 10px;
+    }
+
+    .result-item {
+      margin: 8px 0;
+      font-size: 1.1em;
+    }
+
+    .highlight {
+      font-weight: 600;
+      color: #dc2626;
+    }
+
+    .success {
+      color: #059669;
+    }
+
+    .chart-container {
+      margin-top: 20px;
+      height: 300px;
+      background: #f8fafc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+    }
+
+    .tips {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    .tips h2 {
+      color: #2563eb;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .tips ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .tips li {
+      margin: 12px 0;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border-left: 4px solid #2563eb;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      margin: 0 10px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.2);
+      transition: background 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    @media (max-width: 768px) {
+      .calculator-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .calculator-card {
+        margin: 0 10px;
+      }
+      
+      .header h1 {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔥 FIRE 계산기</h1>
+      <p>Financial Independence, Retire Early - 경제적 자유를 위한 종합 계산 도구</p>
+      <div style="margin-top: 15px;">
+        <a href="index.html" class="nav-link">🏠 홈</a>
+        <a href="asset-allocation.html" class="nav-link">📊 자산 배분</a>
+        <a href="expense-tracker.html" class="nav-link">💸 지출 분석</a>
+        <a href="gift-tax-calculator.html" class="nav-link">💰 증여세 계산기</a>
+      </div>
+    </div>
+
+    <div class="calculator-grid">
+      <!-- FIRE 달성 시기 계산기 -->
+      <div class="calculator-card">
+        <div class="card-title">🎯 FIRE 달성 시기 계산</div>
+        
+        <div class="input-group">
+          <label for="currentAge">현재 나이</label>
+          <input type="number" id="currentAge" value="30" min="20" max="65">
+        </div>
+        
+        <div class="input-group">
+          <label for="currentAssets">현재 자산 (만원)</label>
+          <input type="number" id="currentAssets" value="5000" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="monthlyIncome">월 소득 (만원)</label>
+          <input type="number" id="monthlyIncome" value="500" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="monthlyExpense">월 지출 (만원)</label>
+          <input type="number" id="monthlyExpense" value="300" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="expectedReturn">예상 연간 수익률 (%)</label>
+          <input type="number" id="expectedReturn" value="7" min="0" max="20" step="0.1">
+        </div>
+        
+        <div class="input-group">
+          <label for="fireMultiple">FIRE 배수 (연간 지출의 몇 배)</label>
+          <select id="fireMultiple">
+            <option value="25">25배 (4% 룰)</option>
+            <option value="30">30배 (3.33% 룰)</option>
+            <option value="35">35배 (2.86% 룰)</option>
+          </select>
+        </div>
+        
+        <button class="calculate-btn" onclick="calculateFIRE()">FIRE 달성 시기 계산</button>
+        
+        <div id="fireResult" class="result" style="display: none;">
+          <h3>📊 FIRE 달성 예상 결과</h3>
+          <div id="fireDetails"></div>
+        </div>
+      </div>
+
+      <!-- 복리 계산기 -->
+      <div class="calculator-card">
+        <div class="card-title">📈 복리 투자 계산</div>
+        
+        <div class="input-group">
+          <label for="initialAmount">초기 투자금 (만원)</label>
+          <input type="number" id="initialAmount" value="1000" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="monthlyInvestment">월 투자금 (만원)</label>
+          <input type="number" id="monthlyInvestment" value="200" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="annualReturn">연간 수익률 (%)</label>
+          <input type="number" id="annualReturn" value="7" min="0" max="20" step="0.1">
+        </div>
+        
+        <div class="input-group">
+          <label for="investmentPeriod">투자 기간 (년)</label>
+          <input type="number" id="investmentPeriod" value="20" min="1" max="50">
+        </div>
+        
+        <button class="calculate-btn" onclick="calculateCompound()">복리 효과 계산</button>
+        
+        <div id="compoundResult" class="result" style="display: none;">
+          <h3>💰 복리 투자 결과</h3>
+          <div id="compoundDetails"></div>
+        </div>
+      </div>
+
+      <!-- 안전 인출률 계산기 -->
+      <div class="calculator-card">
+        <div class="card-title">🛡️ 안전 인출률 계산</div>
+        
+        <div class="input-group">
+          <label for="totalAssets">총 자산 (만원)</label>
+          <input type="number" id="totalAssets" value="10000" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="withdrawalRate">인출률 (%)</label>
+          <select id="withdrawalRate">
+            <option value="3">3% (매우 안전)</option>
+            <option value="3.5">3.5% (안전)</option>
+            <option value="4" selected>4% (전통적)</option>
+            <option value="4.5">4.5% (적극적)</option>
+            <option value="5">5% (위험)</option>
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="inflationRate">예상 인플레이션 (%)</label>
+          <input type="number" id="inflationRate" value="2.5" min="0" max="10" step="0.1">
+        </div>
+        
+        <button class="calculate-btn" onclick="calculateWithdrawal()">안전 인출 금액 계산</button>
+        
+        <div id="withdrawalResult" class="result" style="display: none;">
+          <h3>💸 안전 인출 결과</h3>
+          <div id="withdrawalDetails"></div>
+        </div>
+      </div>
+
+      <!-- 목표 달성 계산기 -->
+      <div class="calculator-card">
+        <div class="card-title">🎯 목표 자산 달성 계산</div>
+        
+        <div class="input-group">
+          <label for="targetAmount">목표 자산 (만원)</label>
+          <input type="number" id="targetAmount" value="10000" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="currentSavings">현재 저축 (만원)</label>
+          <input type="number" id="currentSavings" value="1000" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="monthlySaving">월 저축 (만원)</label>
+          <input type="number" id="monthlySaving" value="150" min="0">
+        </div>
+        
+        <div class="input-group">
+          <label for="savingReturn">저축 수익률 (%)</label>
+          <input type="number" id="savingReturn" value="5" min="0" max="15" step="0.1">
+        </div>
+        
+        <button class="calculate-btn" onclick="calculateTarget()">목표 달성 시기 계산</button>
+        
+        <div id="targetResult" class="result" style="display: none;">
+          <h3>🏆 목표 달성 결과</h3>
+          <div id="targetDetails"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIRE 팁 섹션 -->
+    <div class="tips">
+      <h2>🔥 FIRE 달성을 위한 핵심 팁</h2>
+      <ul>
+        <li><strong>수입 증대:</strong> 부업, 투잡, 스킬 업그레이드를 통해 수입원을 다양화하세요</li>
+        <li><strong>지출 최적화:</strong> 고정비 줄이기, 구독 서비스 정리, 생활비 절약이 핵심입니다</li>
+        <li><strong>투자 전략:</strong> 장기 분산투자, 인덱스 펀드 활용으로 안정적 수익을 추구하세요</li>
+        <li><strong>4% 룰:</strong> 연간 지출의 25배 자산 확보 시 4% 인출로 평생 생활 가능합니다</li>
+        <li><strong>세금 최적화:</strong> 연금저축, ISA, 절세 상품을 적극 활용하세요</li>
+        <li><strong>부채 관리:</strong> 고금리 부채 우선 상환, 레버리지 투자는 신중하게 접근하세요</li>
+        <li><strong>정기 점검:</strong> 월 1회 자산 현황 점검, 분기별 포트폴리오 리밸런싱을 실시하세요</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // 숫자 포맷팅 함수
+    function formatNumber(num) {
+      return new Intl.NumberFormat('ko-KR').format(Math.round(num));
+    }
+
+    // FIRE 달성 시기 계산
+    function calculateFIRE() {
+      const currentAge = parseInt(document.getElementById('currentAge').value);
+      const currentAssets = parseFloat(document.getElementById('currentAssets').value) * 10000; // 만원 -> 원
+      const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value) * 10000;
+      const monthlyExpense = parseFloat(document.getElementById('monthlyExpense').value) * 10000;
+      const expectedReturn = parseFloat(document.getElementById('expectedReturn').value) / 100;
+      const fireMultiple = parseFloat(document.getElementById('fireMultiple').value);
+
+      const monthlySavings = monthlyIncome - monthlyExpense;
+      const annualExpense = monthlyExpense * 12;
+      const targetAssets = annualExpense * fireMultiple;
+      
+      if (monthlySavings <= 0) {
+        alert('월 저축액이 0 이하입니다. 수입을 늘리거나 지출을 줄여주세요.');
+        return;
+      }
+
+      // 복리 계산으로 목표 달성 시기 계산
+      let assets = currentAssets;
+      let years = 0;
+      const monthlyReturn = expectedReturn / 12;
+
+      while (assets < targetAssets && years < 50) {
+        assets = assets * (1 + monthlyReturn) + monthlySavings;
+        years += 1/12;
+      }
+
+      const fireAge = currentAge + Math.ceil(years);
+      const savingsRate = (monthlySavings / monthlyIncome) * 100;
+
+      const resultDiv = document.getElementById('fireResult');
+      const detailsDiv = document.getElementById('fireDetails');
+      
+      detailsDiv.innerHTML = `
+        <div class="result-item">목표 자산: <span class="highlight">${formatNumber(targetAssets/10000)}만원</span></div>
+        <div class="result-item">FIRE 달성 예상 나이: <span class="highlight">${fireAge}세</span></div>
+        <div class="result-item">달성까지 기간: <span class="highlight">${Math.ceil(years)}년</span></div>
+        <div class="result-item">현재 저축률: <span class="success">${savingsRate.toFixed(1)}%</span></div>
+        <div class="result-item">월 저축액: <span class="success">${formatNumber(monthlySavings/10000)}만원</span></div>
+        <div class="result-item">FIRE 후 월 수입: <span class="success">${formatNumber(annualExpense/12/10000)}만원</span></div>
+      `;
+      
+      resultDiv.style.display = 'block';
+    }
+
+    // 복리 계산
+    function calculateCompound() {
+      const initialAmount = parseFloat(document.getElementById('initialAmount').value) * 10000;
+      const monthlyInvestment = parseFloat(document.getElementById('monthlyInvestment').value) * 10000;
+      const annualReturn = parseFloat(document.getElementById('annualReturn').value) / 100;
+      const years = parseInt(document.getElementById('investmentPeriod').value);
+
+      const monthlyReturn = annualReturn / 12;
+      const totalMonths = years * 12;
+      
+      // 복리 계산 공식
+      let totalValue = initialAmount;
+      let totalInvested = initialAmount;
+      
+      for (let month = 1; month <= totalMonths; month++) {
+        totalValue = totalValue * (1 + monthlyReturn) + monthlyInvestment;
+        totalInvested += monthlyInvestment;
+      }
+      
+      const totalReturn = totalValue - totalInvested;
+      const returnRate = (totalReturn / totalInvested) * 100;
+
+      const resultDiv = document.getElementById('compoundResult');
+      const detailsDiv = document.getElementById('compoundDetails');
+      
+      detailsDiv.innerHTML = `
+        <div class="result-item">총 투자원금: <span class="highlight">${formatNumber(totalInvested/10000)}만원</span></div>
+        <div class="result-item">최종 자산: <span class="success">${formatNumber(totalValue/10000)}만원</span></div>
+        <div class="result-item">투자 수익: <span class="success">${formatNumber(totalReturn/10000)}만원</span></div>
+        <div class="result-item">수익률: <span class="success">${returnRate.toFixed(1)}%</span></div>
+        <div class="result-item">연평균 성장률: <span class="success">${(Math.pow(totalValue/totalInvested, 1/years) - 1).toFixed(3) * 100}%</span></div>
+      `;
+      
+      resultDiv.style.display = 'block';
+    }
+
+    // 안전 인출률 계산
+    function calculateWithdrawal() {
+      const totalAssets = parseFloat(document.getElementById('totalAssets').value) * 10000;
+      const withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value) / 100;
+      const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100;
+
+      const annualWithdrawal = totalAssets * withdrawalRate;
+      const monthlyWithdrawal = annualWithdrawal / 12;
+      const realReturn = withdrawalRate - inflationRate;
+      
+      // 인출 지속 가능성 계산 (단순화된 모델)
+      const sustainability = realReturn > 0 ? "안전" : "위험";
+      const sustainabilityColor = realReturn > 0 ? "success" : "highlight";
+
+      const resultDiv = document.getElementById('withdrawalResult');
+      const detailsDiv = document.getElementById('withdrawalDetails');
+      
+      detailsDiv.innerHTML = `
+        <div class="result-item">연간 인출 가능 금액: <span class="success">${formatNumber(annualWithdrawal/10000)}만원</span></div>
+        <div class="result-item">월 인출 가능 금액: <span class="success">${formatNumber(monthlyWithdrawal/10000)}만원</span></div>
+        <div class="result-item">실질 수익률: <span class="${sustainabilityColor}">${(realReturn*100).toFixed(1)}%</span></div>
+        <div class="result-item">지속 가능성: <span class="${sustainabilityColor}">${sustainability}</span></div>
+        <div class="result-item">30년 후 자산 (인플레이션 고려): <span class="highlight">${formatNumber((totalAssets * Math.pow(1 + realReturn, 30))/10000)}만원</span></div>
+      `;
+      
+      resultDiv.style.display = 'block';
+    }
+
+    // 목표 달성 계산
+    function calculateTarget() {
+      const targetAmount = parseFloat(document.getElementById('targetAmount').value) * 10000;
+      const currentSavings = parseFloat(document.getElementById('currentSavings').value) * 10000;
+      const monthlySaving = parseFloat(document.getElementById('monthlySaving').value) * 10000;
+      const savingReturn = parseFloat(document.getElementById('savingReturn').value) / 100;
+
+      const monthlyReturn = savingReturn / 12;
+      let assets = currentSavings;
+      let months = 0;
+
+      if (monthlySaving <= 0) {
+        alert('월 저축액을 입력해주세요.');
+        return;
+      }
+
+      while (assets < targetAmount && months < 600) { // 최대 50년
+        assets = assets * (1 + monthlyReturn) + monthlySaving;
+        months++;
+      }
+
+      const years = Math.floor(months / 12);
+      const remainingMonths = months % 12;
+      const totalSaved = monthlySaving * months;
+      const interestEarned = assets - currentSavings - totalSaved;
+
+      const resultDiv = document.getElementById('targetResult');
+      const detailsDiv = document.getElementById('targetDetails');
+      
+      if (months >= 600) {
+        detailsDiv.innerHTML = `
+          <div class="result-item"><span class="highlight">현재 조건으로는 50년 내 달성이 어렵습니다.</span></div>
+          <div class="result-item">월 저축액을 늘리거나 수익률을 높여보세요.</div>
+        `;
+      } else {
+        detailsDiv.innerHTML = `
+          <div class="result-item">목표 달성 기간: <span class="highlight">${years}년 ${remainingMonths}개월</span></div>
+          <div class="result-item">총 저축액: <span class="success">${formatNumber(totalSaved/10000)}만원</span></div>
+          <div class="result-item">이자 수익: <span class="success">${formatNumber(interestEarned/10000)}만원</span></div>
+          <div class="result-item">최종 자산: <span class="success">${formatNumber(assets/10000)}만원</span></div>
+          <div class="result-item">원금 대비 수익률: <span class="success">${((interestEarned/totalSaved)*100).toFixed(1)}%</span></div>
+        `;
+      }
+      
+      resultDiv.style.display = 'block';
+    }
+
+    // 페이지 로드 시 기본 계산 실행
+    window.onload = function() {
+      calculateFIRE();
+      calculateCompound();
+      calculateWithdrawal();
+      calculateTarget();
+    };
+  </script>
+</body>
+</html>
